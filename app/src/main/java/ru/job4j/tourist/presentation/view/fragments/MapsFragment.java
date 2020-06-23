@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Objects;
 
@@ -38,9 +38,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         initMaps();
-        Button btnSave = view.findViewById(R.id.btn_save);
-        btnSave.setOnClickListener(this::saveLocation);
-
+        FloatingActionButton findLocation = view.findViewById(R.id.fab_find);
+        findLocation.setOnClickListener(this::findLocation);
         return view;
     }
 
@@ -64,7 +63,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 LocationManager.GPS_PROVIDER, 1000, 0, getChangedLocation());
     }
 
-    public void saveLocation(View view) {
+    public void findLocation(View view) {
         if (location != null) {
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
             MarkerOptions marker = new MarkerOptions().position(currentLocation).title("Hello Maps");

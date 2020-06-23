@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "ru.job4j.tourist"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -47,6 +47,8 @@ dependencies {
     api 'com.google.dagger:dagger:2.24'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.24'
     testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.24'
+    //material design
+    implementation 'com.google.android.material:material:1.3.0-alpha01'
     //tests
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -3,4 +3,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="save">SAVE</string>
     <string name="pin">pin</string>
+    <string name="explore">Explore</string>
+    <string name="saved">Saved</string>
 </resources>

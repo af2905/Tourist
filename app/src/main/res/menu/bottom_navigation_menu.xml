@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottomNavigationExploreMenuId"
+        android:icon="@drawable/ic_baseline_location_on_24"
+        android:title="@string/explore" />
+    <item
+        android:id="@+id/bottomNavigationSavedMenuId"
+        android:icon="@drawable/ic_baseline_bookmark_border_24"
+        android:title="@string/saved" />
+</menu>
