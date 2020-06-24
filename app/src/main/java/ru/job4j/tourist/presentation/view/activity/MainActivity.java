@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             case R.id.bottomNavigationSavedMenuId:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 return true;
-
             default:
                 throw new IllegalStateException("Unexpected value: " + item.getItemId());
         }
