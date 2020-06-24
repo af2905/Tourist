@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +20,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Objects;
 
@@ -30,16 +31,17 @@ import ru.job4j.tourist.R;
 import static android.content.Context.LOCATION_SERVICE;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
+    private static final int REQUEST_CODE = 123;
     private GoogleMap map;
     private Location location;
+    private LocationManager locationManager;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        locationManager = (LocationManager) Objects.requireNonNull(getActivity()).getSystemService(LOCATION_SERVICE);
         initMaps();
-        FloatingActionButton findLocation = view.findViewById(R.id.fab_find);
-        findLocation.setOnClickListener(this::findLocation);
         return view;
     }
 
@@ -51,25 +53,55 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.getUiSettings().setCompassEnabled(true);
+        map.getUiSettings().setMyLocationButtonEnabled(true);
+        map.getUiSettings().setAllGesturesEnabled(true);
 
-        LocationManager locationManager = (LocationManager) Objects.requireNonNull(getActivity()).getSystemService(LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        int fineLocationPermissionStatus = ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarseLocationPermissionStatus = ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        if (fineLocationPermissionStatus == PackageManager.PERMISSION_GRANTED
+                && coarseLocationPermissionStatus == PackageManager.PERMISSION_GRANTED) {
+            Objects.requireNonNull(locationManager).requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 1000, 0, getChangedLocation());
+        } else {
+            ActivityCompat.requestPermissions(
+                    getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    REQUEST_CODE);
+        }
+        map.setMyLocationEnabled(true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length == 2
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             return;
         }
-        Objects.requireNonNull(locationManager).requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 1000, 0, getChangedLocation());
+        throw new IllegalStateException("Unexpected value: " + requestCode);
     }
 
     public void findLocation(View view) {
         if (location != null) {
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            MarkerOptions marker = new MarkerOptions().position(currentLocation).title("Hello Maps");
+            MarkerOptions marker =
+                    new MarkerOptions().position(currentLocation).title(getString(R.string.position_info));
             marker.flat(true);
             map.addMarker(marker);
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(
+                    currentLocation).zoom(15).build();
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            //map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+        } else {
+            Toast.makeText(getActivity(), R.string.need_permission_info, Toast.LENGTH_SHORT).show();
         }
     }
 
