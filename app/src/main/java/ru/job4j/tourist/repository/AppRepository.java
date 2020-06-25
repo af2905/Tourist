@@ -25,8 +25,10 @@ public class AppRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public PinEntity getPinById(int id) {
-        return pinDao.getById(id);
+    public Single<PinEntity> getPinById(int id) {
+        return Single.just(pinDao.getById(id))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public void deletePin(PinEntity pin) {
