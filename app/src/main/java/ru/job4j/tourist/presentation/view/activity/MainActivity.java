@@ -2,7 +2,6 @@ package ru.job4j.tourist.presentation.view.activity;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,9 +15,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import ru.job4j.tourist.R;
 import ru.job4j.tourist.presentation.view.fragments.MapsFragment;
+import ru.job4j.tourist.presentation.view.fragments.SavedPinsFragment;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private static final String MAPS_FRAGMENT = "mapsFragment";
+    private static final String SAVED_PINS_FRAGMENT = "savedPinsFragment";
+    private BottomNavigationView navigationView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigationView = findViewById(R.id.bottom_navigation_view);
+        navigationView = findViewById(R.id.bottom_navigation_view);
         navigationView.inflateMenu(R.menu.bottom_navigation_menu);
         navigationView.setOnNavigationItemSelectedListener(this);
         BadgeDrawable badgeDrawable = navigationView.getOrCreateBadge(R.id.bottomNavigationSavedMenuId);
@@ -41,11 +43,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bottomNavigationExploreMenuId:
-                Toast.makeText(this, "Explore", Toast.LENGTH_SHORT).show();
                 loadMapsFragment();
                 return true;
             case R.id.bottomNavigationSavedMenuId:
-                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+                loadSavedPinsFragment();
                 return true;
             default:
                 throw new IllegalStateException("Unexpected value: " + item.getItemId());
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void loadMapsFragment() {
         loadFragment(new MapsFragment(), MAPS_FRAGMENT);
+    }
+
+    private void loadSavedPinsFragment() {
+        loadFragment(new SavedPinsFragment(), SAVED_PINS_FRAGMENT);
     }
 
     private void loadFragment(Fragment fragment, String tag) {

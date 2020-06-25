@@ -19,6 +19,10 @@ public class AppRepository {
         pinDao.insert(pin);
     }
 
+    public void deletePin(PinEntity pin) {
+        pinDao.delete(pin);
+    }
+
     public Single<List<PinEntity>> getAllPins() {
         return Single.just(pinDao.getAll())
                 .subscribeOn(Schedulers.io())
@@ -31,7 +35,5 @@ public class AppRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void deletePin(PinEntity pin) {
-        pinDao.delete(pin);
-    }
+
 }

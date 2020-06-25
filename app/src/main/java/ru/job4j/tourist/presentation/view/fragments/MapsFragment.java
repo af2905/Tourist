@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,11 +25,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import ru.job4j.tourist.R;
+import ru.job4j.tourist.di.component.ViewModelComponent;
+import ru.job4j.tourist.domain.ApplicationViewModel;
+import ru.job4j.tourist.presentation.base.BaseFragment;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
+public class MapsFragment extends BaseFragment implements OnMapReadyCallback {
+    @Inject
+    protected ApplicationViewModel applicationViewModel;
     private static final int REQUEST_CODE = 123;
     private GoogleMap map;
     private Location location;
@@ -43,6 +49,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         locationManager = (LocationManager) Objects.requireNonNull(getActivity()).getSystemService(LOCATION_SERVICE);
         initMaps();
         return view;
+    }
+
+    @Override
+    protected void injectDependency(ViewModelComponent component) {
+        component.inject(this);
     }
 
     private void initMaps() {
@@ -67,13 +78,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 && coarseLocationPermissionStatus == PackageManager.PERMISSION_GRANTED) {
             Objects.requireNonNull(locationManager).requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 1000, 0, getChangedLocation());
+            map.setMyLocationEnabled(true);
         } else {
             ActivityCompat.requestPermissions(
                     getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     REQUEST_CODE);
         }
-        map.setMyLocationEnabled(true);
     }
 
     @Override
