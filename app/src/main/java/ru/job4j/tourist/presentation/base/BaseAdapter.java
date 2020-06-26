@@ -32,6 +32,11 @@ public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder, M, L> exte
         }
     }
 
+    public void deleteItem(int position) {
+        list.remove(position);
+        notifyItemRemoved(position);
+    }
+
     public int getItemCount() {
         return list.size();
     }

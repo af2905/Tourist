@@ -35,6 +35,6 @@ public class PinsAdapter extends BaseAdapter<PinViewHolder, PinEntity, IPinClick
 
     @Override
     public int getItemCount() {
-        return 0;
+        return list.size();
     }
 }

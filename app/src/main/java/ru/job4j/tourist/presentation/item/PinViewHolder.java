@@ -33,7 +33,7 @@ public class PinViewHolder extends RecyclerView.ViewHolder {
 
     private void setupItem() {
         TextView locationInfo = itemView.findViewById(R.id.location_info);
-        locationInfo.setText(String.format("%s, %s", pin.getLatitude(), pin.getLongitude()));
+        locationInfo.setText(String.format("%s, %s, %s", pin.getLatitude(), pin.getLongitude(), pin.getTitle()));
         itemView.setOnClickListener(openPin);
     }
 }
