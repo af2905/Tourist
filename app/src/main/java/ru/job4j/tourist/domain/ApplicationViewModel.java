@@ -12,14 +12,18 @@ import com.google.android.gms.maps.GoogleMap;
 
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import ru.job4j.tourist.repository.AppRepository;
 import ru.job4j.tourist.repository.database.entity.PinEntity;
 
 public class ApplicationViewModel extends AndroidViewModel {
     private AppRepository repository;
+    private Disposable disposable;
+    private MutableLiveData<GoogleMap> map = new MutableLiveData<>();
     private MutableLiveData<List<PinEntity>> liveDataPins = new MutableLiveData<>();
     private MutableLiveData<PinEntity> liveDataSelectedPin = new MutableLiveData<>();
-    private MutableLiveData<GoogleMap> map = new MutableLiveData<>();
+    private MutableLiveData<Integer> liveDataSelectedPinId = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isPinSelected = new MutableLiveData<>();
 
     public ApplicationViewModel(@NonNull Application application, AppRepository repository) {
         super(application);
@@ -36,23 +40,56 @@ public class ApplicationViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void getAllPins() {
-        repository.getAllPins().subscribe(list -> liveDataPins.setValue(list));
+        disposable = repository.getAllPins().subscribe(list -> liveDataPins.setValue(list));
     }
 
     @SuppressLint("CheckResult")
-    public void getPinById(int id) {
-        repository.getPinById(id).subscribe(pin -> liveDataSelectedPin.setValue(pin));
+    public void getSelectedPin() {
+        if (getLiveDataSelectedPinId().getValue() != null) {
+            int id = getLiveDataSelectedPinId().getValue();
+            disposable = repository.getPinById(id).subscribe(pin -> liveDataSelectedPin.setValue(pin));
+        }
     }
 
     public LiveData<List<PinEntity>> getLiveDataPins() {
         return liveDataPins;
     }
 
-    public MutableLiveData<GoogleMap> getMap() {
+    public LiveData<GoogleMap> getMap() {
         return map;
     }
 
     public void setMap(MutableLiveData<GoogleMap> map) {
         this.map = map;
+    }
+
+    public LiveData<PinEntity> getLiveDataSelectedPin() {
+        return liveDataSelectedPin;
+    }
+
+    public LiveData<Integer> getLiveDataSelectedPinId() {
+        return liveDataSelectedPinId;
+    }
+
+    public void setLiveDataSelectedPinId(int id) {
+        MutableLiveData<Integer> pinId = new MutableLiveData<>();
+        pinId.setValue(id);
+        this.liveDataSelectedPinId = pinId;
+    }
+
+    public LiveData<Boolean> getIsPinSelected() {
+        return isPinSelected;
+    }
+
+    public void setIsPinSelected(Boolean isSelected) {
+        MutableLiveData<Boolean> temp = new MutableLiveData<>();
+        temp.setValue(isSelected);
+        this.isPinSelected = temp;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        disposable.dispose();
     }
 }

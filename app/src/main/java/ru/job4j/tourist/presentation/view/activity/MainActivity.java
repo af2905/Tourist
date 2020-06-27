@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,7 +43,8 @@ public class MainActivity extends BaseActivity
         badgeDrawable.setNumber(1);
 
         if (savedInstanceState == null) {
-            loadMapsFragment();
+            applicationViewModel.setIsPinSelected(false);
+            loadMapFragment();
         }
     }
 
@@ -57,9 +57,11 @@ public class MainActivity extends BaseActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bottomNavigationExploreMenuId:
-                loadMapsFragment();
+                applicationViewModel.setIsPinSelected(false);
+                loadMapFragment();
                 return true;
             case R.id.bottomNavigationSavedMenuId:
+                applicationViewModel.setIsPinSelected(false);
                 loadSavedPinsFragment();
                 return true;
             default:
@@ -67,7 +69,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void loadMapsFragment() {
+    private void loadMapFragment() {
         loadFragment(new MapFragment(), MAPS_FRAGMENT);
     }
 
@@ -88,6 +90,8 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void showPin(int id) {
-        Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show();
+        applicationViewModel.setLiveDataSelectedPinId(id);
+        applicationViewModel.setIsPinSelected(true);
+        loadMapFragment();
     }
 }

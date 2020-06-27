@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,9 +53,18 @@ public class MapFragment extends BaseFragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         locationManager = (LocationManager) Objects.requireNonNull(getActivity()).getSystemService(LOCATION_SERVICE);
         initMap();
-        applicationViewModel.getAllPins();
-        applicationViewModel.getMap().observe(this, googleMap -> map = googleMap);
-        applicationViewModel.getLiveDataPins().observe(this, this::loadSavedPins);
+        Boolean isPinSelected = applicationViewModel.getIsPinSelected().getValue();
+
+        if (isPinSelected != null && isPinSelected) {
+            applicationViewModel.getAllPins();
+            applicationViewModel.getMap().observe(this, googleMap -> map = googleMap);
+            applicationViewModel.getLiveDataPins().observe(this, this::loadSavedPins);
+            showSelectedSavedPin();
+        } else {
+            applicationViewModel.getAllPins();
+            applicationViewModel.getMap().observe(this, googleMap -> map = googleMap);
+            applicationViewModel.getLiveDataPins().observe(this, this::loadSavedPins);
+        }
         return view;
     }
 
@@ -153,27 +163,40 @@ public class MapFragment extends BaseFragment
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        MarkerOptions marker =
-                new MarkerOptions().position(latLng).title(getString(R.string.landmark));
-        marker.flat(true);
-        map.addMarker(marker);
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(
-                latLng).zoom(15).build();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         PinEntity pin = new PinEntity(
                 String.valueOf(latLng.latitude), String.valueOf(latLng.longitude), getString(R.string.landmark));
         applicationViewModel.insertPin(pin);
+        applicationViewModel.getAllPins();
     }
 
     private void loadSavedPins(List<PinEntity> pins) {
         for (PinEntity pin : pins) {
-            double lat = Double.parseDouble(pin.getLatitude());
-            double lng = Double.parseDouble(pin.getLongitude());
-            LatLng latLng = new LatLng(lat, lng);
             MarkerOptions marker =
-                    new MarkerOptions().position(latLng).title(getString(R.string.landmark));
+                    new MarkerOptions().position(getPinLatLng(pin)).title(getString(R.string.landmark));
             marker.flat(true);
             map.addMarker(marker);
         }
+    }
+
+    private void showSelectedSavedPin() {
+        applicationViewModel.getSelectedPin();
+        applicationViewModel.getLiveDataSelectedPin().observe(this, pin -> {
+            MarkerOptions marker =
+                    new MarkerOptions().position(getPinLatLng(pin)).title(getString(R.string.landmark));
+            marker.flat(true);
+            map.addMarker(marker);
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(getPinLatLng(pin))
+                    .zoom(15)
+                    .build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            map.animateCamera(cameraUpdate);
+        });
+    }
+
+    private LatLng getPinLatLng(PinEntity pin) {
+        double lat = Double.parseDouble(pin.getLatitude());
+        double lng = Double.parseDouble(pin.getLongitude());
+        return new LatLng(lat, lng);
     }
 }

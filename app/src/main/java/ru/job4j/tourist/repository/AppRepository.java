@@ -2,6 +2,7 @@ package ru.job4j.tourist.repository;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -23,9 +24,8 @@ public class AppRepository {
         pinDao.delete(pin);
     }
 
-    public Single<List<PinEntity>> getAllPins() {
-        return Single.just(pinDao.getAll())
-                .subscribeOn(Schedulers.io())
+    public Flowable<List<PinEntity>> getAllPins() {
+        return Flowable.just(pinDao.getAll())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -34,6 +34,4 @@ public class AppRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
-
 }
