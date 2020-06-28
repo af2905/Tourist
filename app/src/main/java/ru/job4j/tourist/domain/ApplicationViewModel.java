@@ -24,6 +24,7 @@ public class ApplicationViewModel extends AndroidViewModel {
     private MutableLiveData<PinEntity> liveDataSelectedPin = new MutableLiveData<>();
     private MutableLiveData<Integer> liveDataSelectedPinId = new MutableLiveData<>();
     private MutableLiveData<Boolean> isPinSelected = new MutableLiveData<>();
+    private MutableLiveData<Integer> count = new MutableLiveData<>();
 
     public ApplicationViewModel(@NonNull Application application, AppRepository repository) {
         super(application);
@@ -72,9 +73,9 @@ public class ApplicationViewModel extends AndroidViewModel {
     }
 
     public void setLiveDataSelectedPinId(int id) {
-        MutableLiveData<Integer> pinId = new MutableLiveData<>();
-        pinId.setValue(id);
-        this.liveDataSelectedPinId = pinId;
+        MutableLiveData<Integer> temp = new MutableLiveData<>();
+        temp.setValue(id);
+        this.liveDataSelectedPinId = temp;
     }
 
     public LiveData<Boolean> getIsPinSelected() {
@@ -85,6 +86,26 @@ public class ApplicationViewModel extends AndroidViewModel {
         MutableLiveData<Boolean> temp = new MutableLiveData<>();
         temp.setValue(isSelected);
         this.isPinSelected = temp;
+    }
+
+    public LiveData<Integer> getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        MutableLiveData<Integer> temp = new MutableLiveData<>();
+        int current;
+        if (getCount().getValue() != null) {
+            if (count == 0) {
+                temp.setValue(0);
+            } else {
+                current = getCount().getValue();
+                temp.setValue(current + count);
+            }
+        } else {
+            temp.setValue(count);
+        }
+        this.count = temp;
     }
 
     @Override

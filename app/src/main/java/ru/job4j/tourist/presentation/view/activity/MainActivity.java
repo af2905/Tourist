@@ -27,6 +27,8 @@ public class MainActivity extends BaseActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener, SavedPinsFragment.CallbackPinClick {
     private static final String MAPS_FRAGMENT = "mapsFragment";
     private static final String SAVED_PINS_FRAGMENT = "savedPinsFragment";
+    private BottomNavigationView navigationView;
+    private BadgeDrawable badgeDrawable;
 
     @Inject
     ApplicationViewModel applicationViewModel;
@@ -36,15 +38,15 @@ public class MainActivity extends BaseActivity
         Places.initialize(this, getString(R.string.google_maps_key));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView navigationView = findViewById(R.id.bottom_navigation_view);
+        navigationView = findViewById(R.id.bottom_navigation_view);
         navigationView.inflateMenu(R.menu.bottom_navigation_menu);
         navigationView.setOnNavigationItemSelectedListener(this);
-        BadgeDrawable badgeDrawable = navigationView.getOrCreateBadge(R.id.bottomNavigationSavedMenuId);
-        badgeDrawable.setNumber(1);
+        badgeDrawable = navigationView.getOrCreateBadge(R.id.bottomNavigationSavedMenuId);
 
         if (savedInstanceState == null) {
             applicationViewModel.setIsPinSelected(false);
             loadMapFragment();
+            setExploreItemEnabled(false);
         }
     }
 
@@ -58,10 +60,16 @@ public class MainActivity extends BaseActivity
         switch (item.getItemId()) {
             case R.id.bottomNavigationExploreMenuId:
                 applicationViewModel.setIsPinSelected(false);
+                setExploreItemEnabled(false);
+                setSavedItemEnabled(true);
                 loadMapFragment();
                 return true;
             case R.id.bottomNavigationSavedMenuId:
                 applicationViewModel.setIsPinSelected(false);
+                setSavedItemEnabled(false);
+                setExploreItemEnabled(true);
+                applicationViewModel.setCount(0);
+                badgeDrawable.clearNumber();
                 loadSavedPinsFragment();
                 return true;
             default:
@@ -92,6 +100,17 @@ public class MainActivity extends BaseActivity
     public void showPin(int id) {
         applicationViewModel.setLiveDataSelectedPinId(id);
         applicationViewModel.setIsPinSelected(true);
+        navigationView.getMenu().findItem(R.id.bottomNavigationExploreMenuId).setChecked(true);
+        setExploreItemEnabled(false);
+        setSavedItemEnabled(true);
         loadMapFragment();
+    }
+
+    private void setExploreItemEnabled(Boolean isEnabled) {
+        navigationView.getMenu().findItem(R.id.bottomNavigationExploreMenuId).setEnabled(isEnabled);
+    }
+
+    private void setSavedItemEnabled(Boolean isEnabled) {
+        navigationView.getMenu().findItem(R.id.bottomNavigationSavedMenuId).setEnabled(isEnabled);
     }
 }

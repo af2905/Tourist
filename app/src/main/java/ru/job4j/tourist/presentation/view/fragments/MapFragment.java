@@ -23,6 +23,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 import java.util.Objects;
@@ -53,17 +55,13 @@ public class MapFragment extends BaseFragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         locationManager = (LocationManager) Objects.requireNonNull(getActivity()).getSystemService(LOCATION_SERVICE);
         initMap();
-        Boolean isPinSelected = applicationViewModel.getIsPinSelected().getValue();
+        applicationViewModel.getAllPins();
+        applicationViewModel.getMap().observe(this, googleMap -> map = googleMap);
+        applicationViewModel.getLiveDataPins().observe(this, this::loadSavedPins);
 
+        Boolean isPinSelected = applicationViewModel.getIsPinSelected().getValue();
         if (isPinSelected != null && isPinSelected) {
-            applicationViewModel.getAllPins();
-            applicationViewModel.getMap().observe(this, googleMap -> map = googleMap);
-            applicationViewModel.getLiveDataPins().observe(this, this::loadSavedPins);
             showSelectedSavedPin();
-        } else {
-            applicationViewModel.getAllPins();
-            applicationViewModel.getMap().observe(this, googleMap -> map = googleMap);
-            applicationViewModel.getLiveDataPins().observe(this, this::loadSavedPins);
         }
         return view;
     }
@@ -167,6 +165,12 @@ public class MapFragment extends BaseFragment
                 String.valueOf(latLng.latitude), String.valueOf(latLng.longitude), getString(R.string.landmark));
         applicationViewModel.insertPin(pin);
         applicationViewModel.getAllPins();
+        applicationViewModel.setCount(1);
+
+        BottomNavigationView navigationView;
+        navigationView = Objects.requireNonNull(getActivity()).findViewById(R.id.bottom_navigation_view);
+        BadgeDrawable badgeDrawable = navigationView.getOrCreateBadge(R.id.bottomNavigationSavedMenuId);
+        applicationViewModel.getCount().observe(this, badgeDrawable::setNumber);
     }
 
     private void loadSavedPins(List<PinEntity> pins) {
