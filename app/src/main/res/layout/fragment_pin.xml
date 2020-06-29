@@ -14,9 +14,10 @@
 
     <TextView
         android:id="@+id/location_info"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_weight="1"
         tools:text="location info" />
 
 </LinearLayout>

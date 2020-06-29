@@ -90,9 +90,9 @@ public class MapFragment extends BaseFragment
 
     private void setCustomUiSettings(GoogleMap map) {
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setCompassEnabled(true);
-        map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setAllGesturesEnabled(true);
     }
 
@@ -176,7 +176,7 @@ public class MapFragment extends BaseFragment
     private void loadSavedPins(List<PinEntity> pins) {
         for (PinEntity pin : pins) {
             MarkerOptions marker =
-                    new MarkerOptions().position(getPinLatLng(pin)).title(getString(R.string.landmark));
+                    new MarkerOptions().position(getPinLatLng(pin)).title(pin.getTitle());
             marker.flat(true);
             map.addMarker(marker);
         }
